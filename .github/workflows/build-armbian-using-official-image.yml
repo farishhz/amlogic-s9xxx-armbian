@@ -406,8 +406,11 @@ jobs:
           armbian_url="${{ inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
               armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
-              armbian_name="Armbian.*noble.*.img.xz"
-              armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
+              # Cari file image minimal terbaru yang tersedia (prioritas minimal / server)
+              armbian_file=$(curl -sL "${armbian_site}" | grep -oE 'Armbian_[0-9\._]+_Odroidn2_[a-z]+_current_[0-9\._]+_minimal\.img\.xz' | sort -V | tail -n 1)
+              if [[ -z "${armbian_file}" ]]; then
+                  armbian_file=$(curl -sL "${armbian_site}" | grep -oE 'Armbian_[0-9\._]+_Odroidn2_[a-z]+_[a-zA-Z0-9\._]+\.img\.xz' | sort -V | tail -n 1)
+              fi
               if [[ -n "${armbian_file}" ]]; then
                   armbian_url="${armbian_site}${armbian_file}"
               else
